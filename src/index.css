@@ -1,0 +1,381 @@
+@import './fonts.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Never let decorative layers create horizontal scroll on any device */
+html,
+body {
+  overflow-x: clip;
+}
+
+@layer base {
+  :root {
+    /* Warm ivory paper — church hymnal feel */
+    --background: 44 38% 95%;
+    --foreground: 35 22% 16%;
+    --card: 45 40% 98%;
+    --card-foreground: 35 22% 16%;
+    --popover: 45 40% 98%;
+    --popover-foreground: 35 22% 16%;
+    /* Deep royal blue — stained-glass sapphire */
+    --primary: 221 96% 31%;
+    --primary-foreground: 44 38% 97%;
+    /* Light blue tint — highlighted, tappable surfaces */
+    --secondary: 223 72% 94%;
+    --secondary-foreground: 221 60% 25%;
+    --muted: 42 24% 90%;
+    --muted-foreground: 36 12% 40%;
+    --accent: 221 96% 31%;
+    --accent-foreground: 44 38% 97%;
+    --destructive: 4 56% 42%;
+    --destructive-foreground: 44 38% 97%;
+    --border: 40 22% 82%;
+    --input: 40 22% 82%;
+    --ring: 221 96% 31%;
+    --radius: 0.5rem;
+  }
+
+  /* Dark mode — evening service */
+  .dark {
+    --background: 226 32% 10%;
+    --foreground: 44 30% 92%;
+    --card: 226 26% 15%;
+    --card-foreground: 44 30% 92%;
+    --popover: 226 26% 15%;
+    --popover-foreground: 44 30% 92%;
+    --primary: 220 85% 62%;
+    --primary-foreground: 226 40% 8%;
+    --secondary: 222 30% 22%;
+    --secondary-foreground: 220 70% 88%;
+    --muted: 226 20% 20%;
+    --muted-foreground: 40 12% 62%;
+    --accent: 220 85% 62%;
+    --accent-foreground: 226 40% 8%;
+    --destructive: 4 60% 55%;
+    --destructive-foreground: 44 30% 95%;
+    --border: 224 20% 26%;
+    --input: 224 20% 26%;
+    --ring: 220 85% 62%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    color-scheme: light;
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+  ::selection {
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+  }
+}
+
+@layer utilities {
+  .note-display {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+  .font-serif-display {
+    font-family: 'Fraunces', Georgia, serif;
+    font-optical-sizing: auto;
+  }
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+  }
+
+  /* ── Tappable selects: blue tint + chevron + soft beckoning glow ── */
+  .select-chevron {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%231a2fa0' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.7rem center;
+    padding-right: 2.4rem;
+  }
+  .tap-select {
+    @apply border-primary/45 bg-secondary text-secondary-foreground shadow-sm;
+  }
+  .tap-select:hover {
+    @apply border-primary brightness-[1.02];
+  }
+  .hint-glow {
+    animation: hint-glow 2.6s ease-in-out infinite;
+  }
+  .ease-reveal {
+    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+
+/* ── Signature motion ─────────────────────────────────────────────── */
+
+/* Ken Burns — slow cinematic drift on the hero wash */
+@keyframes kenburns {
+  0% {
+    transform: scale(1) translate(0, 0);
+  }
+  100% {
+    transform: scale(1.08) translate(-1.5%, -2%);
+  }
+}
+.kenburns {
+  animation: kenburns 30s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+/* Golden notes drifting upward like dust motes in window light */
+@keyframes drift-up {
+  0% {
+    transform: translateY(24px) scale(0.85) rotate(-4deg);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.75;
+  }
+  70% {
+    opacity: 0.55;
+  }
+  100% {
+    transform: translateY(-280px) scale(1.05) rotate(6deg);
+    opacity: 0;
+  }
+}
+.float-note {
+  position: absolute;
+  bottom: 0;
+  opacity: 0;
+  animation: drift-up linear infinite;
+  will-change: transform, opacity;
+}
+
+/* The answer settles in with a soft blur-pop whenever it changes */
+@keyframes answer-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.92);
+    filter: blur(8px);
+  }
+  60% {
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+}
+.answer-pop {
+  animation: answer-pop 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: center;
+}
+
+/* Gentle beckoning ring on the inline instrument pickers */
+@keyframes hint-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 hsl(221 96% 31% / 0.28);
+  }
+  50% {
+    box-shadow: 0 0 0 6px hsl(221 96% 31% / 0);
+  }
+}
+
+/* Fine film grain over the whole page — analog warmth */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Beacon ring on the accessibility & language button — "pick me first" */
+@keyframes a11y-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 hsl(221 96% 31% / 0.42);
+  }
+  50% {
+    box-shadow: 0 0 0 9px hsl(221 96% 31% / 0);
+  }
+}
+.a11y-pulse {
+  animation: a11y-pulse 2.4s ease-in-out infinite;
+  border-color: hsl(221 96% 31% / 0.55) !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .a11y-pulse {
+    animation: none;
+  }
+}
+
+/* Flag emoji (regional indicators) render as boxes on older Android —
+   hide them everywhere but iOS/macOS, where they render natively */
+@supports not (-webkit-touch-callout: none) {
+  .flag-emoji {
+    display: none;
+  }
+}
+
+/* ── SCN accessibility modes ──────────────────────────────────────── */
+
+/* Calm mode: stop all decorative motion (same effect as reduced-motion) */
+.calm .kenburns,
+.calm .float-note,
+.calm .answer-pop,
+.calm .hint-glow,
+.calm .a11y-pulse {
+  animation: none !important;
+}
+.calm .float-note {
+  display: none;
+}
+.calm * {
+  transition-duration: 0.01ms !important;
+}
+.calm html {
+  scroll-behavior: auto;
+}
+
+/* Large text */
+.large-text body {
+  font-size: 18px;
+}
+.large-text .note-display.text-6xl {
+  font-size: 4.5rem;
+}
+
+/* Colorblind-friendly: bold outlines on every selection, so meaning never
+   rides on color alone */
+.a11y-cb [aria-pressed='true'],
+.a11y-cb [aria-checked='true'] {
+  outline: 3px solid hsl(var(--foreground)) !important;
+  outline-offset: 1px;
+}
+
+/* Grain respects dark mode */
+.dark .grain {
+  mix-blend-mode: screen;
+  opacity: 0.06;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .kenburns,
+  .float-note,
+  .answer-pop,
+  .hint-glow {
+    animation: none !important;
+  }
+  .float-note {
+    display: none;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── SCN Universal Access modes (GetWell standard) ─────────────── */
+
+/* Color-vision SVG filters (defined in ColorVisionFilters component) */
+.filter-deuteranomaly body { filter: url('#deuteranomaly'); }
+.filter-deuteranopia body { filter: url('#deuteranopia'); }
+.filter-protanomaly body { filter: url('#protanomaly'); }
+.filter-protanopia body { filter: url('#protanopia'); }
+.filter-tritanomaly body { filter: url('#tritanomaly'); }
+.filter-tritanopia body { filter: url('#tritanopia'); }
+.filter-achromatopsia body { filter: grayscale(100%) brightness(1.08); }
+
+/* Neurodivergent */
+.autism-mode * {
+  transition-duration: 0.4s !important;
+  animation-duration: 0.4s !important;
+}
+.autism-mode .kenburns,
+.autism-mode .float-note { animation: none !important; }
+.autism-mode .a11y-pulse { animation: none !important; }
+
+.adhd-mode .grain { display: none; }
+.adhd-mode .float-note { animation: none !important; opacity: 0.25; }
+.adhd-mode section,
+.adhd-mode .rounded-lg { border-width: 2px; }
+
+.dyslexia-mode body {
+  letter-spacing: 0.05em;
+  word-spacing: 0.1em;
+}
+.dyslexia-mode p,
+.dyslexia-mode li { line-height: 1.9; }
+
+/* Mental health */
+.anxiety-mode {
+  --primary: 210 70% 45%;
+  --ring: 210 70% 45%;
+}
+.anxiety-mode .kenburns,
+.anxiety-mode .float-note { animation-duration: 60s !important; }
+
+.ptsd-mode *,
+.ptsd-mode *::before,
+.ptsd-mode *::after {
+  animation: none !important;
+  transition-duration: 0.15s !important;
+}
+.ptsd-mode .kenburns,
+.ptsd-mode .float-note,
+.ptsd-mode .answer-pop { animation: none !important; }
+
+.mania-mode .kenburns,
+.mania-mode .float-note { animation: none !important; }
+.mania-mode .hint-glow { animation: none !important; box-shadow: none; }
+.mania-mode .a11y-pulse { animation: none !important; }
+
+.cognitive-mode .grain { display: none; }
+.cognitive-mode .float-note,
+.cognitive-mode .kenburns { animation: none !important; }
+.cognitive-mode body { font-size: 17px; }
+.cognitive-mode p, .cognitive-mode li { line-height: 1.85; }
+
+/* Vision */
+.high-contrast body {
+  --background: 0 0% 100%;
+  --foreground: 0 0% 0%;
+  --border: 0 0% 0%;
+  --muted-foreground: 0 0% 15%;
+}
+.high-contrast button,
+.high-contrast select,
+.high-contrast a { border-width: 2px; }
+.high-contrast .text-muted-foreground { color: hsl(0 0% 20%); }
+
+/* Motor & physical */
+.large-targets button,
+.large-targets select,
+.large-targets a {
+  min-height: 56px;
+}
+.large-targets [role='switch'] { transform: scale(1.3); }
+
+.keyboard-only *:focus {
+  outline: 3px solid hsl(var(--primary)) !important;
+  outline-offset: 3px;
+}
+.keyboard-only .hint-glow { animation: none !important; }
+
+/* Speech & communication — simplified language hides the dense explainer blocks */
+.simple-language .hint-steps-detail,
+.simple-language footer p:first-child { display: none; }
+.simple-language body { font-size: 17px; }
