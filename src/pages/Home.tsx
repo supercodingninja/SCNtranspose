@@ -26,6 +26,18 @@ import { StaffChord } from '@/components/StaffChord'
 import { applyPrefs, loadPrefs, savePrefs, type A11yPrefs, type Strings } from '@/lib/a11y'
 import { useStrings } from '@/lib/useStrings'
 
+// ─────────────────────────────────────────────────────────────────────────────
+// This Area Of Code Is: The main transposer application page.
+// Explanation: I redesigned the layout so that on iPad and desktop screens,
+//   the two main sections (Set the Key + The Band Plays) appear side-by-side
+//   in a two-column grid. This eliminates the need to scroll vertically to
+//   see both sections. On mobile phones, they stack vertically as before.
+//   The wider max-width breakpoints (md:max-w-4xl, lg:max-w-6xl) use the full
+//   iPad screen real estate instead of leaving 60% empty.
+// In Other Words: I put the two main panels next to each other on big screens
+//   so you can see everything at once without swiping up and down.
+// ─────────────────────────────────────────────────────────────────────────────
+
 type Mode = 'major' | 'minor' | 'chord' | 'note'
 
 const CHORD_GROUPS: { label: string; ids: string[] }[] = [
@@ -44,18 +56,10 @@ function instById(id: string): Instrument | undefined {
 
 /** Player colors — first come, first served, in the order players join the band. */
 const PLAYER_COLORS = [
-  '#b0551c', // burnt orange
-  '#2e7d52', // green
-  '#6b4fa1', // purple
-  '#a12626', // red
-  '#0f7b7b', // teal
-  '#96711a', // gold-brown
-  '#a13b72', // magenta
-  '#465a8a', // steel blue
-  '#7a4b1e', // brown
-  '#3f7a3a', // olive
+  '#b0551c', '#2e7d52', '#6b4fa1', '#a12626', '#0f7b7b',
+  '#96711a', '#a13b72', '#465a8a', '#7a4b1e', '#3f7a3a',
 ]
-const SOURCE_COLOR = '#03339b' // royal blue — whoever leads
+const SOURCE_COLOR = '#03339b'
 
 /** Colorblind-safe member marks: a distinct shape per join order, filled with the player's color. */
 function MemberMark({ index, color }: { index: number; color: string }) {
@@ -86,7 +90,14 @@ function MemberMark({ index, color }: { index: number; color: string }) {
   }
 }
 
-// ── Small building blocks ─────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// This Area Of Code Is: The 12-note grid picker for selecting the root note.
+// Explanation: I render 12 buttons in a responsive grid (4 columns on phone,
+//   6 on tablet+). The active note gets primary styling. Each button calls
+//   onChange with its pitch class (0-11).
+// In Other Words: I made a grid of all 12 music notes so you can tap the one
+//   you want.
+// ─────────────────────────────────────────────────────────────────────────────
 
 function NoteGrid({
   value,
@@ -121,6 +132,14 @@ function NoteGrid({
     </div>
   )
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// This Area Of Code Is: A segmented control for switching between major/minor/chord/note modes.
+// Explanation: I render a pill-shaped button group that behaves like radio buttons.
+//   The selected option gets primary styling. Only one mode can be active at a time.
+// In Other Words: I made a switch with four choices so you can pick what kind
+//   of music thing you're working with.
+// ─────────────────────────────────────────────────────────────────────────────
 
 function Segmented<T extends string>({
   options,
@@ -190,7 +209,15 @@ function HintSteps({ steps }: { steps: string[] }) {
   )
 }
 
-/** The leader's picker — sits inside the sentence. */
+// ─────────────────────────────────────────────────────────────────────────────
+// This Area Of Code Is: The leader's instrument picker that sits inside the sentence.
+// Explanation: I render a styled select dropdown with instrument families grouped
+//   by optgroup. The select-chevron class adds a custom dropdown arrow. The
+//   tap-select class adds the blue tint to indicate it's tappable.
+// In Other Words: I made a dropdown menu so you can pick which instrument
+//   is leading the song.
+// ─────────────────────────────────────────────────────────────────────────────
+
 function InlineInstrumentSelect({
   id,
   value,
@@ -228,7 +255,15 @@ function InlineInstrumentSelect({
   )
 }
 
-/** A band member's own instrument picker — same tappable treatment. */
+// ─────────────────────────────────────────────────────────────────────────────
+// This Area Of Code Is: A band member's own instrument picker.
+// Explanation: Same as the leader's picker but slightly smaller (h-11 vs h-12)
+//   and without the "Piano" default option since members are always transposing
+//   instruments.
+// In Other Words: I made a smaller dropdown for each band member to pick
+//   their instrument.
+// ─────────────────────────────────────────────────────────────────────────────
+
 function MemberSelect({
   id,
   value,
@@ -264,6 +299,13 @@ function MemberSelect({
     </span>
   )
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// This Area Of Code Is: The chord quality picker for chord mode.
+// Explanation: I group chords by category (basics, sevenths, color chords) using
+//   optgroup. The value is the chord ID which maps to the CHORDS array.
+// In Other Words: I made a dropdown of chord types organized by how fancy they are.
+// ─────────────────────────────────────────────────────────────────────────────
 
 function ChordSelect({
   id,
@@ -311,6 +353,13 @@ function ChordSelect({
   )
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// This Area Of Code Is: The flat/sharp spelling toggle.
+// Explanation: I render two small buttons that switch between flat and sharp
+//   note spellings. This affects how note names display throughout the app.
+// In Other Words: I made a switch so you can see notes as "Bb" or "A#".
+// ─────────────────────────────────────────────────────────────────────────────
+
 function SpellingToggle({
   spelling,
   onChange,
@@ -348,12 +397,20 @@ function SectionHeading({ index, title, hint }: { index: string; title: string; 
     <div className="mb-4 flex items-baseline gap-3">
       <span className="note-display text-xs font-semibold text-primary">{index}</span>
       <h2 className="font-serif text-xl font-semibold tracking-tight">{title}</h2>
-      {hint && <p className="hidden text-xs text-muted-foreground sm:block">{hint}</p>}
+      {hint && <p className="hidden text-xs text-muted-foreground lg:block">{hint}</p>}
     </div>
   )
 }
 
-/** Big answer display for any mode. */
+// ─────────────────────────────────────────────────────────────────────────────
+// This Area Of Code Is: The big answer display for any mode.
+// Explanation: I show the transposed result in large text. For chords, I show
+//   the chord name and its tones. For notes, just the note name. For keys,
+//   the key name and its fifths count.
+// In Other Words: I show the answer in big letters so you can read it from
+//   across the room.
+// ─────────────────────────────────────────────────────────────────────────────
+
 function ResultText({
   pc,
   mode,
@@ -402,7 +459,15 @@ function ResultText({
   )
 }
 
-// ── Page ──────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// This Area Of Code Is: The main page component state and logic.
+// Explanation: I manage all the state for the transposer: the source instrument,
+//   the selected note, the mode (major/minor/chord/note), the chord quality,
+//   and the list of band members. I compute the concert pitch from the source
+//   instrument's transposition, then calculate what each band member sees.
+// In Other Words: I keep track of everything you pick and figure out what
+//   notes each person should play.
+// ─────────────────────────────────────────────────────────────────────────────
 
 interface Player {
   uid: number
@@ -524,9 +589,19 @@ export default function Home() {
   return (
     <div className="min-h-dvh">
       <div className="grain" aria-hidden />
-      <div className="mx-auto w-full max-w-2xl px-4 pb-16 sm:px-6 lg:max-w-5xl lg:px-8">
+      
+      {/* ───────────────────────────────────────────────────────────────────────
+          This Area Of Code Is: The main content container with responsive width.
+          Explanation: I expanded the breakpoints so iPad uses md:max-w-4xl and
+            desktop uses lg:max-w-6xl. This fills the iPad screen instead of leaving
+            60% empty whitespace on the sides.
+          In Other Words: I made the app stretch wider on iPad so you don't see
+            blank space on the left and right.
+          ─────────────────────────────────────────────────────────────────────── */}
+      <div className="mx-auto w-full max-w-2xl px-4 pb-16 sm:px-6 md:max-w-4xl lg:max-w-6xl lg:px-8">
+        
         {/* Header */}
-        <header className="relative flex items-center justify-center border-b border-border py-5">
+        <header className="relative flex items-center justify-center border-b border-border py-4 md:py-5">
           <div className="absolute left-0 flex items-center gap-2">
             <Link
               to="/"
@@ -553,7 +628,7 @@ export default function Home() {
           </div>
         </header>
 
-        {/* Hero */}
+        {/* Hero — compact on iPad */}
         <div className="relative overflow-hidden">
           <div
             aria-hidden
@@ -563,268 +638,281 @@ export default function Home() {
                 'radial-gradient(42% 55% at 22% 18%, hsl(223 90% 88% / 0.9), transparent 70%), radial-gradient(38% 48% at 82% 30%, hsl(221 96% 31% / 0.14), transparent 70%), radial-gradient(50% 42% at 50% 88%, hsl(41 60% 80% / 0.55), transparent 72%)',
             }}
           />
-          <Reveal className="relative pb-6 pt-8 text-center">
+          <Reveal className="relative pb-4 pt-6 text-center md:pb-6 md:pt-8">
             <h1 className="font-serif text-2xl font-semibold leading-tight tracking-tight sm:text-3xl">
               {t.heroTitleA}
               <br />
               {t.heroTitleB}
             </h1>
-            <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
+            <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted-foreground md:mt-3">
               {t.heroSub}
             </p>
           </Reveal>
         </div>
 
-        {/* ── 01 Set the key ── */}
-        <section id="source" aria-labelledby="source" className="mb-12">
-          <Reveal>
-            <SectionHeading index="01" title={t.s1Title} hint={t.s1Hint} />
-            <HintSteps steps={t.s1Steps} />
-          </Reveal>
-          <Reveal delay={80}>
-            <div className="rounded-lg border border-border bg-card p-4 shadow-sm sm:p-6">
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-                <span className="font-serif text-xl font-medium sm:text-2xl">{t.ifThe}</span>
-                <InlineInstrumentSelect id="source-inst" value={sourceId} onChange={setSourceId} t={t} />
-                <span className="font-serif text-xl font-medium sm:text-2xl">
-                  {sourceInst && sourceInst.family === 'voice' ? t.isSinging : t.isPlaying}
-                </span>
-              </div>
+        {/* ───────────────────────────────────────────────────────────────────────
+            This Area Of Code Is: The two-column grid wrapper for iPad layout.
+            Explanation: On md+ screens, Section 01 (Set the Key) and Section 02
+              (The Band Plays) appear side-by-side. This eliminates vertical scrolling
+              between sections on iPad. On mobile, they stack vertically as before.
+            In Other Words: On iPad, I put the two main panels next to each other
+              so you can see everything at once without swiping up and down.
+            ─────────────────────────────────────────────────────────────────────── */}
+        <div className="grid gap-8 md:grid-cols-2 md:gap-6 lg:gap-8">
 
-              <div className="mt-4 flex flex-col gap-4">
-                <Segmented
-                  label={t.whatPlaying}
-                  value={mode}
-                  onChange={setMode}
-                  options={[
-                    { value: 'major', label: t.majorKey },
-                    { value: 'minor', label: t.minorKey },
-                    { value: 'chord', label: t.chord },
-                    { value: 'note', label: t.note },
-                  ]}
-                />
+          {/* ── 01 Set the key ── */}
+          <section id="source" aria-labelledby="source" className="mb-12 md:mb-0">
+            <Reveal>
+              <SectionHeading index="01" title={t.s1Title} hint={t.s1Hint} />
+              <HintSteps steps={t.s1Steps} />
+            </Reveal>
+            <Reveal delay={80}>
+              <div className="rounded-lg border border-border bg-card p-4 shadow-sm sm:p-6">
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+                  <span className="font-serif text-xl font-medium sm:text-2xl">{t.ifThe}</span>
+                  <InlineInstrumentSelect id="source-inst" value={sourceId} onChange={setSourceId} t={t} />
+                  <span className="font-serif text-xl font-medium sm:text-2xl">
+                    {sourceInst && sourceInst.family === 'voice' ? t.isSinging : t.isPlaying}
+                  </span>
+                </div>
 
-                {mode === 'chord' && (
-                  <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-                    <span className="font-serif text-xl font-medium sm:text-2xl">{t.a}</span>
-                    <ChordSelect id="chord-quality" value={chordId} onChange={setChordId} groups={CHORD_GROUPS} t={t} />
-                    <span className="font-serif text-xl font-medium sm:text-2xl">{t.on}</span>
+                <div className="mt-4 flex flex-col gap-4">
+                  <Segmented
+                    label={t.whatPlaying}
+                    value={mode}
+                    onChange={setMode}
+                    options={[
+                      { value: 'major', label: t.majorKey },
+                      { value: 'minor', label: t.minorKey },
+                      { value: 'chord', label: t.chord },
+                      { value: 'note', label: t.note },
+                    ]}
+                  />
+
+                  {mode === 'chord' && (
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+                      <span className="font-serif text-xl font-medium sm:text-2xl">{t.a}</span>
+                      <ChordSelect id="chord-quality" value={chordId} onChange={setChordId} groups={CHORD_GROUPS} t={t} />
+                      <span className="font-serif text-xl font-medium sm:text-2xl">{t.on}</span>
+                    </div>
+                  )}
+
+                  <div>
+                    <div className="mb-2 flex items-center justify-between">
+                      <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                        {sourceInst
+                          ? `${sourceInst.name}${mode === 'note' ? t.writtenNoteLabel : t.writtenRoot}`
+                          : mode === 'note'
+                            ? t.theNote
+                            : t.rootKeyOfMusic}
+                      </span>
+                      <SpellingToggle spelling={spelling} onChange={setSpelling} t={t} />
+                    </div>
+                    <NoteGrid value={pc} onChange={setPc} spelling={spelling} />
                   </div>
-                )}
+                </div>
 
-                <div>
-                  <div className="mb-2 flex items-center justify-between">
-                    <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      {sourceInst
-                        ? `${sourceInst.name}${mode === 'note' ? t.writtenNoteLabel : t.writtenRoot}`
-                        : mode === 'note'
-                          ? t.theNote
-                          : t.rootKeyOfMusic}
-                    </span>
-                    <SpellingToggle spelling={spelling} onChange={setSpelling} t={t} />
-                  </div>
-                  <NoteGrid value={pc} onChange={setPc} spelling={spelling} />
+                {/* Source banner */}
+                <div className="mt-5 flex items-center gap-3 rounded-md bg-primary px-4 py-3 text-primary-foreground">
+                  <MemberMark index={0} color="hsl(var(--primary-foreground))" />
+                  <p className="text-sm font-semibold">
+                    {t.sourcePrefix}{' '}
+                    {sourceInst
+                      ? `${sourceInst.name}${sourceInst.key !== 'C' ? ` · ${t.inKey} ${sourceInst.key}` : ''}${t.sourcePlayerSuffix}`
+                      : t.sourcePianoText}
+                  </p>
                 </div>
               </div>
+            </Reveal>
+          </section>
 
-              {/* Source banner */}
-              <div className="mt-5 flex items-center gap-3 rounded-md bg-primary px-4 py-3 text-primary-foreground">
-                <MemberMark index={0} color="hsl(var(--primary-foreground))" />
-                <p className="text-sm font-semibold">
-                  {t.sourcePrefix}{' '}
-                  {sourceInst
-                    ? `${sourceInst.name}${sourceInst.key !== 'C' ? ` · ${t.inKey} ${sourceInst.key}` : ''}${t.sourcePlayerSuffix}`
-                    : t.sourcePianoText}
-                </p>
-              </div>
-            </div>
-          </Reveal>
-        </section>
-
-        {/* ── 02 The band plays ── */}
-        <section id="band" aria-labelledby="band">
-          <Reveal>
-            <SectionHeading index="02" title={t.s2Title} hint={t.s2Hint} />
-            <HintSteps steps={t.s2Steps} />
-          </Reveal>
-          <Reveal delay={80}>
-            <div className="rounded-lg border border-border bg-card p-4 shadow-sm sm:p-6">
-              {/* Members */}
-              <div>
-                {members.map((p, index) => {
-                  const inst = instById(p.instrumentId)
-                  if (!inst) return null
-                  const color = colorFor(index)
-                  const chordPlayer = isChordPlayer(inst)
-                  const singleNote = !chordPlayer
-                  const tone = toneFor(p.uid, inst)
-                  const noteOut = transpose((concertPc + tone) % 12, inst, true)
-                  const chordOut = transpose(concertPc, inst, true)
-                  return (
-                    <div key={p.uid} className="border-b border-border/60 py-4 first:pt-0 last:border-b-0">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2.5">
-                            <MemberMark index={index} color={color} />
-                            <MemberSelect
-                              id={`member-${p.uid}`}
-                              value={p.instrumentId}
-                              onChange={(v) => changeMember(p.uid, v)}
-                              t={t}
-                            />
-                            {inst.key !== 'C' && (
-                              <span className="note-display shrink-0 rounded border border-border px-1.5 py-0.5 text-[10px] font-semibold text-muted-foreground">
-                                {inst.key}
-                              </span>
-                            )}
-                          </div>
-                          <div
-                            key={`${p.instrumentId}-${concertPc}-${mode}-${chordId}-${tone}-${spelling}`}
-                            className={cn('answer-pop mt-2 pl-[18px]', inst.offset % 12 === 0 ? 'text-foreground/70' : 'text-primary')}
-                          >
-                            {singleNote && mode === 'chord' ? (
-                              (() => {
-                                // Horn language: ONE written note in the player's real register,
-                                // said as a chord tone, cross-referenced to the piano key.
-                                const wm = writtenMidiForTone(concertPc, tone, inst)
-                                const pm = pianoMidiForTone(concertPc, tone, inst)
-                                const writtenName = wm ? wm.name : noteName(noteOut, spelling)
-                                const pianoName = pm ? pm.name : noteName((concertPc + tone) % 12, spelling)
-                                return (
-                                  <>
-                                    <p className="note-display text-2xl font-extrabold leading-none tracking-tight">
-                                      {writtenName}
-                                    </p>
-                                    <p className="note-display mt-2 text-xs text-muted-foreground">
-                                      {t.yourNoteLineA} {writtenName} — {t.theWord} {TONE_LABELS[tone] ?? TONE_SHORT[tone] ?? tone}{' '}
-                                      {t.ofTheChord} {chordName(concertPc, chordById(chordId), spelling)}
-                                    </p>
-                                    <p className="note-display mt-1.5 inline-flex items-center gap-1.5 rounded-full bg-secondary px-2.5 py-1 text-[11px] font-semibold text-secondary-foreground">
-                                      🎹 {t.pianoPlays} {pianoName}
-                                    </p>
-                                  </>
-                                )
-                              })()
-                            ) : (
-                              <ResultText pc={chordOut} mode={mode} chordId={chordId} spelling={spelling} t={t} />
-                            )}
-                            {singleNote && mode !== 'chord' && mode !== 'note' && (
-                              (() => {
-                                const wm = writtenMidiForTone(concertPc, tone, inst)
-                                const pm = pianoMidiForTone(concertPc, tone, inst)
-                                if (!wm || !pm) {
+          {/* ── 02 The band plays ── */}
+          <section id="band" aria-labelledby="band">
+            <Reveal>
+              <SectionHeading index="02" title={t.s2Title} hint={t.s2Hint} />
+              <HintSteps steps={t.s2Steps} />
+            </Reveal>
+            <Reveal delay={80}>
+              <div className="rounded-lg border border-border bg-card p-4 shadow-sm sm:p-6">
+                {/* Members */}
+                <div>
+                  {members.map((p, index) => {
+                    const inst = instById(p.instrumentId)
+                    if (!inst) return null
+                    const color = colorFor(index)
+                    const chordPlayer = isChordPlayer(inst)
+                    const singleNote = !chordPlayer
+                    const tone = toneFor(p.uid, inst)
+                    const noteOut = transpose((concertPc + tone) % 12, inst, true)
+                    const chordOut = transpose(concertPc, inst, true)
+                    return (
+                      <div key={p.uid} className="border-b border-border/60 py-4 first:pt-0 last:border-b-0">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2.5">
+                              <MemberMark index={index} color={color} />
+                              <MemberSelect
+                                id={`member-${p.uid}`}
+                                value={p.instrumentId}
+                                onChange={(v) => changeMember(p.uid, v)}
+                                t={t}
+                              />
+                              {inst.key !== 'C' && (
+                                <span className="note-display shrink-0 rounded border border-border px-1.5 py-0.5 text-[10px] font-semibold text-muted-foreground">
+                                  {inst.key}
+                                </span>
+                              )}
+                            </div>
+                            <div
+                              key={`${p.instrumentId}-${concertPc}-${mode}-${chordId}-${tone}-${spelling}`}
+                              className={cn('answer-pop mt-2 pl-[18px]', inst.offset % 12 === 0 ? 'text-foreground/70' : 'text-primary')}
+                            >
+                              {singleNote && mode === 'chord' ? (
+                                (() => {
+                                  // Horn language: ONE written note in the player's real register,
+                                  // said as a chord tone, cross-referenced to the piano key.
+                                  const wm = writtenMidiForTone(concertPc, tone, inst)
+                                  const pm = pianoMidiForTone(concertPc, tone, inst)
+                                  const writtenName = wm ? wm.name : noteName(noteOut, spelling)
+                                  const pianoName = pm ? pm.name : noteName((concertPc + tone) % 12, spelling)
+                                  return (
+                                    <>
+                                      <p className="note-display text-2xl font-extrabold leading-none tracking-tight">
+                                        {writtenName}
+                                      </p>
+                                      <p className="note-display mt-2 text-xs text-muted-foreground">
+                                        {t.yourNoteLineA} {writtenName} — {t.theWord} {TONE_LABELS[tone] ?? TONE_SHORT[tone] ?? tone}{' '}
+                                        {t.ofTheChord} {chordName(concertPc, chordById(chordId), spelling)}
+                                      </p>
+                                      <p className="note-display mt-1.5 inline-flex items-center gap-1.5 rounded-full bg-secondary px-2.5 py-1 text-[11px] font-semibold text-secondary-foreground">
+                                        🎹 {t.pianoPlays} {pianoName}
+                                      </p>
+                                    </>
+                                  )
+                                })()
+                              ) : (
+                                <ResultText pc={chordOut} mode={mode} chordId={chordId} spelling={spelling} t={t} />
+                              )}
+                              {singleNote && mode !== 'chord' && mode !== 'note' && (
+                                (() => {
+                                  const wm = writtenMidiForTone(concertPc, tone, inst)
+                                  const pm = pianoMidiForTone(concertPc, tone, inst)
+                                  if (!wm || !pm) {
+                                    return (
+                                      <p className="note-display mt-1 text-xs text-muted-foreground">
+                                        {t.writtenNoteOfChord}: {noteName(noteOut, spelling)} · {TONE_SHORT[tone] ?? tone} {t.ofTheChord} ·{' '}
+                                        {t.pianoPlays} {noteName((concertPc + tone) % 12, spelling)}
+                                      </p>
+                                    )
+                                  }
                                   return (
                                     <p className="note-display mt-1 text-xs text-muted-foreground">
-                                      {t.writtenNoteOfChord}: {noteName(noteOut, spelling)} · {TONE_SHORT[tone] ?? tone} {t.ofTheChord} ·{' '}
-                                      {t.pianoPlays} {noteName((concertPc + tone) % 12, spelling)}
+                                      {t.writtenNoteOfChord}: {wm.name} · {TONE_LABELS[tone] ?? TONE_SHORT[tone] ?? tone} {t.ofTheChord} ·{' '}
+                                      🎹 {t.pianoPlays} {pm.name}
                                     </p>
                                   )
-                                }
-                                return (
-                                  <p className="note-display mt-1 text-xs text-muted-foreground">
-                                    {t.writtenNoteOfChord}: {wm.name} · {TONE_LABELS[tone] ?? TONE_SHORT[tone] ?? tone} {t.ofTheChord} ·{' '}
-                                    🎹 {t.pianoPlays} {pm.name}
-                                  </p>
-                                )
-                              })()
+                                })()
+                              )}
+                            </div>
+                            {singleNote && toneOptions.length > 1 && (
+                              <div className="mt-2 pl-[18px]">
+                                <label htmlFor={`tone-${p.uid}`} className="sr-only">
+                                  {memberLabel(p)}
+                                </label>
+                                <select
+                                  id={`tone-${p.uid}`}
+                                  value={tone}
+                                  onChange={(e) => setTones((tt) => ({ ...tt, [p.uid]: Number(e.target.value) }))}
+                                  className="focus-ring select-chevron tap-select h-11 cursor-pointer rounded-md border px-3 text-sm font-medium transition-colors"
+                                >
+                                  {toneOptions.map((tonePc) => (
+                                    <option key={tonePc} value={tonePc}>
+                                      {t.playsThe} {CHORD_TONE_LABELS[tonePc] ?? tonePc}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
                             )}
                           </div>
-                          {singleNote && toneOptions.length > 1 && (
-                            <div className="mt-2 pl-[18px]">
-                              <label htmlFor={`tone-${p.uid}`} className="sr-only">
-                                {memberLabel(p)}
-                              </label>
-                              <select
-                                id={`tone-${p.uid}`}
-                                value={tone}
-                                onChange={(e) => setTones((tt) => ({ ...tt, [p.uid]: Number(e.target.value) }))}
-                                className="focus-ring select-chevron tap-select h-11 cursor-pointer rounded-md border px-3 text-sm font-medium transition-colors"
-                              >
-                                {toneOptions.map((tonePc) => (
-                                  <option key={tonePc} value={tonePc}>
-                                    {t.playsThe} {CHORD_TONE_LABELS[tonePc] ?? tonePc}
-                                  </option>
-                                ))}
-                              </select>
-                            </div>
-                          )}
+                          <button
+                            type="button"
+                            onClick={() => removeMember(p.uid)}
+                            aria-label={`Remove ${memberLabel(p)}`}
+                            className="focus-ring flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-border text-muted-foreground transition-all duration-150 hover:border-destructive hover:text-destructive active:scale-95"
+                          >
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
+                              <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                            </svg>
+                          </button>
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => removeMember(p.uid)}
-                          aria-label={`Remove ${memberLabel(p)}`}
-                          className="focus-ring flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-border text-muted-foreground transition-all duration-150 hover:border-destructive hover:text-destructive active:scale-95"
-                        >
-                          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
-                            <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                          </svg>
-                        </button>
                       </div>
-                    </div>
-                  )
-                })}
-              </div>
-
-              {/* Add member */}
-              <div className="mt-5 flex flex-col gap-3 border-t border-border pt-5 sm:flex-row sm:items-end">
-                <div className="flex-1">
-                  <FieldLabel htmlFor="add-player">{t.addLabel}</FieldLabel>
-                  <select
-                    id="add-player"
-                    value={addId}
-                    onChange={(e) => setAddId(e.target.value)}
-                    className="focus-ring select-chevron tap-select h-14 w-full cursor-pointer rounded-md border px-4 text-base font-medium transition-colors"
-                  >
-                    {FAMILIES.map((f) => (
-                      <optgroup key={f.id} label={f.label}>
-                        {INSTRUMENTS.filter((i) => i.family === f.id).map((i) => (
-                          <option key={i.id} value={i.id}>
-                            {i.name}
-                            {i.key !== 'C' ? ` (${i.key})` : ''}
-                          </option>
-                        ))}
-                      </optgroup>
-                    ))}
-                  </select>
-                  <TapToChange t={t} />
+                    )
+                  })}
                 </div>
-                <button
-                  type="button"
-                  onClick={addMember}
-                  className="focus-ring hint-glow h-14 shrink-0 rounded-md bg-primary px-6 text-sm font-bold text-primary-foreground transition-all duration-150 hover:brightness-110 active:scale-95"
-                >
-                  {t.addPlayer}
-                </button>
-              </div>
 
-              {/* The band on the staff — docked here, or floated as a translucent overlay */}
-              <div id="staff-block" className="mt-6 rounded-lg border border-primary/20 bg-background p-4 sm:p-5">
-                <p className="mb-3 font-serif text-base font-semibold tracking-tight">{t.staffTitle}</p>
-                <FloatingStaff
-                  title={t.staffTitle}
-                  floatLabel={t.staffFloat}
-                  dockLabel={t.staffDock}
-                  closeLabel={t.staffClose}
-                >
-                  {() => (
-                    <StaffChord
-                      rootPc={concertPc}
-                      intervals={intervals}
-                      tones={staffTones}
-                      bracketColor={SOURCE_COLOR}
-                      bracketLabel={staffBracketLabel}
-                      t={t}
-                    />
-                  )}
-                </FloatingStaff>
+                {/* Add member */}
+                <div className="mt-5 flex flex-col gap-3 border-t border-border pt-5 sm:flex-row sm:items-end">
+                  <div className="flex-1">
+                    <FieldLabel htmlFor="add-player">{t.addLabel}</FieldLabel>
+                    <select
+                      id="add-player"
+                      value={addId}
+                      onChange={(e) => setAddId(e.target.value)}
+                      className="focus-ring select-chevron tap-select h-14 w-full cursor-pointer rounded-md border px-4 text-base font-medium transition-colors"
+                    >
+                      {FAMILIES.map((f) => (
+                        <optgroup key={f.id} label={f.label}>
+                          {INSTRUMENTS.filter((i) => i.family === f.id).map((i) => (
+                            <option key={i.id} value={i.id}>
+                              {i.name}
+                              {i.key !== 'C' ? ` (${i.key})` : ''}
+                            </option>
+                          ))}
+                        </optgroup>
+                      ))}
+                    </select>
+                    <TapToChange t={t} />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={addMember}
+                    className="focus-ring hint-glow h-14 shrink-0 rounded-md bg-primary px-6 text-sm font-bold text-primary-foreground transition-all duration-150 hover:brightness-110 active:scale-95"
+                  >
+                    {t.addPlayer}
+                  </button>
+                </div>
+
+                {/* The band on the staff */}
+                <div id="staff-block" className="mt-6 rounded-lg border border-primary/20 bg-background p-4 sm:p-5">
+                  <p className="mb-3 font-serif text-base font-semibold tracking-tight">{t.staffTitle}</p>
+                  <FloatingStaff
+                    title={t.staffTitle}
+                    floatLabel={t.staffFloat}
+                    dockLabel={t.staffDock}
+                    closeLabel={t.staffClose}
+                  >
+                    {() => (
+                      <StaffChord
+                        rootPc={concertPc}
+                        intervals={intervals}
+                        tones={staffTones}
+                        bracketColor={SOURCE_COLOR}
+                        bracketLabel={staffBracketLabel}
+                        t={t}
+                      />
+                    )}
+                  </FloatingStaff>
+                </div>
               </div>
-            </div>
-          </Reveal>
-        </section>
+            </Reveal>
+          </section>
+
+        </div>
+        {/* End two-column grid */}
 
         {/* Footer */}
         <Reveal className="mt-10 text-center" delay={100}>
-          <p className="mx-auto max-w-md text-xs leading-relaxed text-muted-foreground">{t.footerText}</p>
+          <p className="mx-auto max-w-md text-xs leading-relaxed text-muted-foreground md:max-w-lg">{t.footerText}</p>
           <p className="mt-3 text-[11px] font-semibold uppercase tracking-widest text-primary/70">
             {t.footerMark}
           </p>
