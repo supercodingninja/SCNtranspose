@@ -1,14 +1,55 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# This Area Of Code Is: The GitHub Actions workflow that builds and deploys my
+#   Transpose app to GitHub Pages automatically.
+# Explanation: I trigger this workflow every time I push to the main branch.
+#   It installs Node.js, downloads my project dependencies, builds the Vite
+#   app into static files, and deploys the dist folder to GitHub Pages.
+#   The build job must succeed before the deploy job starts.
+# In Other Words: I made a robot that automatically packages my app and puts
+#   it on the internet whenever I update my code.
+# ─────────────────────────────────────────────────────────────────────────────
+
 name: Deploy to GitHub Pages
+
+# ─────────────────────────────────────────────────────────────────────────────
+# This Area Of Code Is: The triggers that start this workflow.
+# Explanation: I run this on every push to the main branch so my live site
+#   always matches my latest code. I also added workflow_dispatch so I can
+#   manually trigger a rebuild from the Actions tab if needed.
+# In Other Words: This starts the robot when I save new code, or when I
+#   press the "run" button myself.
+# ─────────────────────────────────────────────────────────────────────────────
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
 
+# ─────────────────────────────────────────────────────────────────────────────
+# This Area Of Code Is: The permissions this workflow needs to work.
+# Explanation: GitHub Actions needs special permission to read my code and
+#   write to GitHub Pages. I grant the minimum required: read access to
+#   contents, write access to pages, and write access to ID tokens for
+#   secure deployment.
+# In Other Words: I gave the robot the keys it needs to do its job, but
+#   only the keys it absolutely needs.
+# ─────────────────────────────────────────────────────────────────────────────
+
 permissions:
   contents: read
   pages: write
   id-token: write
+
+# ─────────────────────────────────────────────────────────────────────────────
+# This Area Of Code Is: The build job that compiles my app.
+# Explanation: I run this on the latest Ubuntu Linux. First I check out my
+#   code, then I set up Node.js version 20. I use npm install (not npm ci)
+#   because it's more forgiving with lock file mismatches. Then I run the
+#   build script which creates the dist folder with all my static files.
+#   Finally I upload that folder as an artifact for the deploy job.
+# In Other Words: I put my code through a machine that turns it into
+#   simple files any web browser can read, then I save those files.
+# ─────────────────────────────────────────────────────────────────────────────
 
 jobs:
   build:
@@ -18,11 +59,25 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm ci
-      - run: npm run build
-      - uses: actions/upload-pages-artifact@v3
+      - name: Install dependencies
+        run: npm install
+      - name: Build
+        run: npm run build
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # This Area Of Code Is: The deploy job that publishes my app to the internet.
+  # Explanation: This job waits for the build job to finish successfully.
+  #   Then it takes the uploaded dist folder and deploys it to GitHub Pages.
+  #   The environment section connects this to the github-pages environment
+  #   so I can track deployments in my repo settings.
+  # In Other Words: After the machine finishes packaging my app, this puts
+  #   the package on the internet for everyone to see.
+  # ───────────────────────────────────────────────────────────────────────────
+
   deploy:
     needs: build
     runs-on: ubuntu-latest
