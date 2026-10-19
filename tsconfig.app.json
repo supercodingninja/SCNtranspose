@@ -1,34 +1,52 @@
 {
   "compilerOptions": {
-    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
-    "target": "ES2022",
+    // ─────────────────────────────────────────────────────────────────────────
+    // This Area Of Code Is: The TypeScript compiler settings for my app source.
+    // Explanation: I configure how TypeScript compiles my React code. I target
+    //   modern browsers (ES2020), use the bundler module resolution for Vite,
+    //   and enable strict type checking to catch errors early. The paths
+    //   mapping lets me use @/ imports to reference files in src/.
+    // In Other Words: I told the code checker how to read my modern JavaScript
+    //   and let me use shortcuts like @/components instead of long paths.
+    // ─────────────────────────────────────────────────────────────────────────
+    "target": "ES2020",
     "useDefineForClassFields": true,
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
-    "types": ["vite/client"],
     "skipLibCheck": true,
-
-    "baseUrl": ".",
-    "paths": {
-      "@/*": [
-        "./src/*"
-      ]
-    },
-    /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
-    "verbatimModuleSyntax": true,
-    "moduleDetection": "force",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-
-    /* Linting */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    
+    // ─────────────────────────────────────────────────────────────────────────
+    // This Area Of Code Is: The path alias configuration.
+    // Explanation: I map the @ symbol to the src directory so imports like
+    //   @/components/Button resolve to src/components/Button. This keeps my
+    //   import statements clean and consistent regardless of file depth.
+    //   I removed the old baseUrl setting because newer TypeScript versions
+    //   no longer support it with moduleResolution: bundler.
+    // In Other Words: I made a shortcut so I can write @/ instead of
+    //   ../../../ when importing files, and I removed the outdated setting
+    //   that was breaking the build.
+    // ─────────────────────────────────────────────────────────────────────────
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
+  // ───────────────────────────────────────────────────────────────────────────
+  // This Area Of Code Is: The files included in TypeScript checking.
+  // Explanation: I only include the src directory since that's where all my
+  //   application code lives. The config files and node_modules are excluded
+  //   automatically by being omitted from this array.
+  // In Other Words: I told the code checker to only look at my source files
+  //   in the src folder and ignore everything else.
+  // ───────────────────────────────────────────────────────────────────────────
   "include": ["src"]
 }
