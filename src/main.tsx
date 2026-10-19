@@ -1,18 +1,27 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// This Area Of Code Is: The application entry point that mounts the React app.
+// Explanation: I import HashRouter from react-router-dom (not react-router)
+//   because React Router v7 requires importing routing components from the
+//   dom-specific package. HashRouter uses URL fragments (#/app) instead of
+//   browser history, which works on static hosts like GitHub Pages without
+//   server configuration. I also register the service worker for PWA support.
+// In Other Words: I start the app using a navigation style that works on
+//   simple file servers, and I load the offline capability.
+// ─────────────────────────────────────────────────────────────────────────────
+
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { HashRouter } from 'react-router'
+import { HashRouter } from 'react-router-dom'
 import './index.css'
 import App from './App.tsx'
 
 // ─────────────────────────────────────────────────────────────────────────────
-// This Area Of Code Is: The application entry point that mounts the React app.
-// Explanation: I use HashRouter instead of BrowserRouter because GitHub Pages
-//   is a static file host with no server-side rewrites. With BrowserRouter,
-//   refreshing on any route other than / returns a 404. HashRouter puts the
-//   route in the URL fragment (#/app) which never hits the server — GitHub
-//   Pages always serves index.html and the client-side router takes over.
-// In Other Words: I chose a navigation style that works on a simple file
-//   server so the refresh button never breaks my app.
+// This Area Of Code Is: The React root render call.
+// Explanation: I create a root element and render the App component wrapped
+//   in StrictMode for development checks and HashRouter for routing. The
+//   exclamation mark after getElementById tells TypeScript the element exists.
+// In Other Words: I put my app on the screen and turn on the helper that
+//   warns me about mistakes.
 // ─────────────────────────────────────────────────────────────────────────────
 
 createRoot(document.getElementById('root')!).render(
@@ -26,11 +35,10 @@ createRoot(document.getElementById('root')!).render(
 // ─────────────────────────────────────────────────────────────────────────────
 // This Area Of Code Is: Service worker registration for offline PWA support.
 // Explanation: I register the service worker after the page loads so the app
-//   shell caches for offline use. The catch(() => {}) ensures unsupported
-//   browsers silently skip this without crashing the app.
-// In Other Words: I save a copy of my app on the device so it works even
-//   without internet, and I made sure it won't cause problems if the
-//   device doesn't support that feature.
+//   shell caches for offline use. The catch ensures unsupported browsers skip
+//   this silently without crashing.
+// In Other Words: I save a copy of my app on the device so it works without
+//   internet, and I made sure it won't break if the device can't do that.
 // ─────────────────────────────────────────────────────────────────────────────
 
 if ('serviceWorker' in navigator) {
