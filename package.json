@@ -1,14 +1,38 @@
 {
+  // ───────────────────────────────────────────────────────────────────────────
+  // This Area Of Code Is: The npm package manifest that defines my project
+  //   identity and scripts.
+  // Explanation: I declare the project name, keep it private so it cannot be
+  //   accidentally published to npm, and set the module type to ES modules for
+  //   modern JavaScript. The scripts section defines the commands I run to
+  //   develop, build, and preview my app. The build script runs TypeScript
+  //   checking first, then Vite bundling.
+  // In Other Words: This is the ID card for my project that lists its name
+  //   and the buttons I press to test and package it.
+  // ───────────────────────────────────────────────────────────────────────────
   "name": "my-app",
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // This Area Of Code Is: The runtime dependencies my app needs to work.
+  // Explanation: I list all the packages required for my app to function in
+  //   the browser. This includes React for the UI, React Router v7 for
+  //   navigation (imported from react-router-dom), Radix UI for accessible
+  //   components, Tailwind CSS for styling, and various utilities like date-fns
+  //   and zod. These are bundled with my app when deployed.
+  // In Other Words: These are the parts my app needs to run, like an engine
+  //   needs fuel. I added React Router v7 which uses the dom package for
+  //   web navigation.
+  // ───────────────────────────────────────────────────────────────────────────
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-accordion": "^1.2.12",
@@ -57,6 +81,18 @@
     "vaul": "^1.1.2",
     "zod": "^4.3.5"
   },
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // This Area Of Code Is: The development dependencies for building and
+  //   type-checking.
+  // Explanation: I list the tools needed during development but not included
+  //   in the final code that runs in the browser. This includes TypeScript for
+  //   type checking, Vite for bundling, ESLint for code quality, Tailwind CSS
+  //   for styling, and the React plugin for Vite. These help me write better
+  //   code but are not part of the finished app.
+  // In Other Words: These are the tools I use while building my app, like
+  //   hammers and saws, but they are not part of the house I am building.
+  // ───────────────────────────────────────────────────────────────────────────
   "devDependencies": {
     "@eslint/js": "^9.39.1",
     "@types/node": "^24.10.1",
